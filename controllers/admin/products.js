@@ -18,3 +18,26 @@ exports.AddProduct = async(req, res)=>{
         return handleErrorResponse(res, statusCode.error, "Server Error")
     }
 }
+
+exports.getAllProducts = async (req, res) => {
+    const { adminId } = req.body;
+    console.log("body id", adminId);
+
+    if (!adminId) {
+        return handleErrorResponse(res, statusCode.badRequest, "Please provide admin ID");
+    }
+
+    console.log("admin Id", req.admin.dataValues.id);
+
+    try {
+        if (Number(adminId) !== Number(req.admin.dataValues.id)) {
+            return handleErrorResponse(res, statusCode.unauthorized, "You are not authorized to view products");
+        }
+
+        const productList = await products.findAll({ where: { adminId } }); // Rename the result variable
+        return handleSuccessResponse(res, statusCode.success, "Products fetched successfully", productList);
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return handleErrorResponse(res, statusCode.error, "Server Error");
+    }
+};
